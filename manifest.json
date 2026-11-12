@@ -1,0 +1,13 @@
+{
+  "name": "Anota Treino — Biblioteca v2",
+  "description": "Reconstrói a biblioteca Anota Treino com auto layout e componentes aninhados.",
+  "version": 2,
+  "code": "plugin.js",
+  "icon": "icon.png",
+  "permissions": [
+    "content:read",
+    "content:write",
+    "library:read",
+    "library:write"
+  ]
+}
