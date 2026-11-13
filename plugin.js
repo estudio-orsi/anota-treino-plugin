@@ -885,11 +885,11 @@ async function pageSeparator() {
 }
 
 function inputNode(size, state, text, filled) {
-  const H = { sm: 32, md: 40, lg: 48 }[size];
+  const H = BSIZE[size][0];   // mesma altura do Button do mesmo tamanho
   let strokes = [stroke('input')];
   if (state === 'focus') strokes = [stroke('ring'), ring()];
   if (state === 'error') strokes = [stroke('destructive'), ring('destructive', 0.35)];
-  return F({ dir: 'row', ai: 'center', p: [0, 12], w: 280, h: H, fill: 'card', strokes: strokes, r: RADIUS.md, op: state === 'disabled' ? 0.5 : 1 }, [
+  return F({ dir: 'row', ai: 'center', p: [0, 16], w: 280, h: H, fill: 'card', strokes: strokes, r: RADIUS.full, op: state === 'disabled' ? 0.5 : 1 }, [
     T(text, size === 'lg' ? 'body/base' : 'body/sm', filled ? 'foreground' : 'muted-foreground', { name: 'Value', w: 'fill' })]);
 }
 async function pageInput() {
@@ -908,7 +908,7 @@ async function pageTextarea() {
   d.section('State');
   const vc = await variantSet('Textarea', ['State'], grid(NONE, one(['default', 'focus', 'filled', 'disabled'], 'State')), (p) => {
     const f = p.State === 'filled';
-    return F({ dir: 'column', p: [10, 12], w: 260, h: 96, fill: 'card', strokes: p.State === 'focus' ? [stroke('ring'), ring()] : [stroke('input')], r: RADIUS.md, op: p.State === 'disabled' ? 0.5 : 1 }, [
+    return F({ dir: 'column', p: [10, 16], w: 260, h: 96, fill: 'card', strokes: p.State === 'focus' ? [stroke('ring'), ring()] : [stroke('input')], r: RADIUS['2xl'], op: p.State === 'disabled' ? 0.5 : 1 }, [
       T(f ? 'Felt strong today. Increase the weight next time.' : 'Write a note...', 'body/sm', f ? 'foreground' : 'muted-foreground', { name: 'Value', w: 'fill' })]);
   }, { defaults: { State: 'default' } });
   d.put(vc);
@@ -941,7 +941,7 @@ async function pageOTP() {
   const sv = await variantSet('InputOTPSlot', ['State'], grid(NONE, one(['default', 'active', 'filled', 'error'], 'State')), (p) => {
     const st = p.State;
     const strokes = st === 'active' ? [stroke('ring'), ring()] : (st === 'error' ? [stroke('destructive')] : [stroke('input')]);
-    return F({ dir: 'row', ai: 'center', jc: 'center', w: 44, h: 52, fill: 'card', strokes: strokes, r: RADIUS.md }, [
+    return F({ dir: 'row', ai: 'center', jc: 'center', w: 44, h: BSIZE.lg[0], fill: 'card', strokes: strokes, r: RADIUS.full }, [
       st === 'filled' || st === 'error' ? T('A', 'heading/lg', 'foreground', { name: 'Char' }) : (st === 'active' ? R({ name: 'Caret', w: 1, h: 20, fill: 'foreground' }) : null)]);
   }, { defaults: { State: 'default' } });
   d.put(sv);
@@ -954,7 +954,7 @@ async function pageOTP() {
       const ss = st === 'active' ? (k === 0 ? 'active' : 'default') : (st === 'filled' || st === 'error' ? st : 'default');
       kids.push(C('InputOTPSlot', { State: ss }, { name: 'Slot ' + (k + 1), texts: ss === 'filled' || ss === 'error' ? { Char: chars[k] } : null }));
     }
-    return F({ dir: 'row', gap: 8, ai: 'center', h: 52, op: st === 'disabled' ? 0.5 : 1 }, kids);
+    return F({ dir: 'row', gap: 8, ai: 'center', h: BSIZE.lg[0], op: st === 'disabled' ? 0.5 : 1 }, kids);
   }, { defaults: { State: 'default', Length: '6' } });
   d.put(vc);
   await d.done();
@@ -970,8 +970,8 @@ async function pageSelect() {
   d.put(iv);
   d.section('Select / Size × State');
   const vc = await variantSet('Select', ['Size', 'State'], grid(one(['sm', 'md'], 'Size'), one(['default', 'focus', 'open', 'disabled'], 'State')), (p) => {
-    const th = p.Size === 'sm' ? 32 : 40, open = p.State === 'open';
-    const trig = F({ name: 'Trigger', dir: 'row', ai: 'center', gap: 8, p: [0, 12], w: 'fill', h: th, fill: 'card', strokes: p.State === 'focus' || open ? [stroke('ring'), ring()] : [stroke('input')], r: RADIUS.md }, [
+    const th = BSIZE[p.Size][0], open = p.State === 'open';
+    const trig = F({ name: 'Trigger', dir: 'row', ai: 'center', gap: 8, p: [0, 16], w: 'fill', h: th, fill: 'card', strokes: p.State === 'focus' || open ? [stroke('ring'), ring()] : [stroke('input')], r: RADIUS.full }, [
       T('Option 1', 'body/sm', 'foreground', { name: 'Value', w: 'fill' }), Ic(open ? 'chevron-up' : 'chevron-down', 16, 'muted-foreground', { name: 'Icon' })]);
     const content = open ? F({ name: 'Content', dir: 'column', p: 4, w: 'fill', fill: 'popover', stroke: 'border', r: RADIUS.md, shadow: shadow(4, 12, 0.45) }, [
       C('SelectItem', { State: 'selected' }, { name: 'Option 1', w: 'fill', texts: { Label: 'Option 1' } }),
@@ -1443,7 +1443,7 @@ async function pageSetRow() {
     return F({ dir: 'row', gap: 8, ai: 'center', w: 343, h: 48 }, [
       F({ name: 'Set', dir: 'row', jc: 'center', w: 24 }, [T('1', 'body/sm-medium', done ? 'brand' : 'muted-foreground', { name: 'Number' })]),
     ].concat([['Kg', '60'], ['Reps', '8'], ['RPE', '7']].map(([lb, val]) =>
-      F({ name: 'Cell ' + lb, dir: 'row', ai: 'center', jc: 'center', w: 68, h: 40, fill: done ? ['success', 0.12] : 'background', strokes: [stroke(done ? 'success' : 'input', 1, 'inner', { op: done ? 0.5 : null })], r: RADIUS.md }, [
+      F({ name: 'Cell ' + lb, dir: 'row', ai: 'center', jc: 'center', w: 68, h: 40, fill: done ? ['success', 0.12] : 'background', strokes: [stroke(done ? 'success' : 'input', 1, 'inner', { op: done ? 0.5 : null })], r: RADIUS.full }, [
         T(st === 'empty' ? '0' : val, 'body/base-medium', st === 'empty' ? 'muted-foreground' : 'foreground', { name: 'Value' })]))).concat([
       F({ name: 'Failure toggle', dir: 'row', ai: 'center', jc: 'center', w: 28, h: 24, stroke: 'border', r: RADIUS.sm }, [T('F', 'body/xs-medium', 'muted-foreground', { name: 'F' })]),
       Spacer(),
